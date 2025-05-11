@@ -90,7 +90,7 @@ Automating re-encryption ensures that:
 
 ---
 
-##  Steps:
+##  Steps for basic Example:
 1. To run it in windows u have to work in WSL(Windows Subsystem for Linux)
   ```bash
   wsl --install
@@ -137,4 +137,32 @@ and here if we add the output file to our cluster the secret_word will be decryp
 ![image](https://github.com/user-attachments/assets/a5d3656f-a69f-4541-83d8-d80b68777870)
 that happen because sealedSecret decrypts the secret for those who have access to K8s Cluster
 
+---
+## Steps for Automate Re-encryption:
 
+1. Identify All Existing SealedSecrets in the Cluster
+  to Retrieve all SealedSecrets that are currently present in the Kubernetes cluster.
+  ```bash
+  kubectl get sealedsecrets --all-namespaces
+  ```
+2. Fetch All Active Public Keys of the SealedSecrets Controller
+  Fetch the latest public keys from the SealedSecrets controller.
+  ```bash
+  kubectl get secret -n kube-system sealed-secrets-key -o yaml
+  ```
+3. Decrypt Each SealedSecret Using the Existing Private Keys
+  ```bash
+  kubeseal --controller-namespace kube-system --decrypt --sealed-secret <sealed-secret-file>
+  ```
+4. Re-encrypt the Decrypted Secrets Using the Latest Public Key
+   Once the SealedSecrets are decrypted, re-encrypt them with the latest public key.
+  ```bash
+  kubeseal --controller-namespace kube-system --format=yaml --cert <path-to-new-public-key> --re-encrypt <decrypted-secret>
+  ```
+5. Update the Existing SealedSecret Objects with the Re-encrypted Data
+  to Replace the existing SealedSecret objects in the cluster with the newly re-encrypted data.
+  ```bash
+  kubectl apply -f <path-to-re-encrypted-sealedsecret.yaml>
+  ```
+6. Logging and Reporting Mechanism
+to track the progress of the re-encryption process.
