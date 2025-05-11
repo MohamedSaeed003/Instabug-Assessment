@@ -1,4 +1,5 @@
 # Instabug-Assessment
+This assessment about design a feature for the kubeseal CLI that automates re-encrypting all SealedSecrets in a Kubernetes cluster
 
 ## Why SealedSecrets?
 
