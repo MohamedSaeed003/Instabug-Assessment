@@ -90,5 +90,51 @@ Automating re-encryption ensures that:
 
 ---
 
-##  Implementation:
+##  Steps:
+1. To run it in windows u have to work in WSL(Windows Subsystem for Linux)
+  ```bash
+  wsl --install
+```
+
+2. install [Docker Desktop](https://www.docker.com/products/docker-desktop) and check Settings, Resources,  WSL Integration
+to verfiy Docker works 
+```bash
+dokcer version
+```
+
+3. we need to create K8s cluster, we choose to use [Minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download)
+4. install [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets?tab=readme-ov-file#kubeseal)
+5. Install kubeseal
+```bash
+wget https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.29.0/kubeseal-0.29.0-linux-amd64.tar.gz
+```
+and for verification
+```bash
+kubeseal --version
+```
+```bash
+kubeseal --help
+```
+![image](https://github.com/user-attachments/assets/eb812501-e98e-4e88-bfd0-b876a5eb6b09)
+--
+6. Install the SealedSecret CRD and server-side controller into the kube-system namespace:
+```bash
+kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.29.0/controller.yaml
+```
+for verification 
+```bash
+kubectl get pods -n kube-system
+```
+![image](https://github.com/user-attachments/assets/2e807654-882b-446e-b8c3-814bb78ca7b2)
+--
+7. Lets Generates a Kubernetes secret named mysecret
+![image](https://github.com/user-attachments/assets/b698fce7-568e-4f89-9bf4-8b2c928658da)
+secret_word not encrypted its base64-encoded
+to encrypted we should pipe kubeseal
+![image](https://github.com/user-attachments/assets/cb3fd78e-8842-43e0-9b15-ba2b6ba39153)
+
+and here if we add the output file to our cluster the secret_word will be decrypted 
+![image](https://github.com/user-attachments/assets/a5d3656f-a69f-4541-83d8-d80b68777870)
+that happen because sealedSecret decrypts the secret for those who have access to K8s Cluster
+
 
